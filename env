@@ -1,0 +1,4 @@
+NODE_ENV=production
+ADMIN_USERNAME=Mike
+ADMIN_PASSWORD=Mike@1234!
+SESSION_SECRET=orbix-super-secret-session-key-2026-xK9mP3qR
