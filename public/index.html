@@ -10988,23 +10988,46 @@ const log = {
 };
 
 // ── Anthropic API key management ─────────────────────────────────────────────
-function getAnthropicKey(){ return localStorage.getItem('orbix_anthropic_key')||''; }
+// ── Key storage: localStorage + cookie dual storage for max persistence ───────
+function setCookie(name, val){
+  try{
+    const exp = new Date(Date.now() + 365*864e5).toUTCString();
+    document.cookie = name+'='+encodeURIComponent(val)+';expires='+exp+';path=/;SameSite=Lax';
+  }catch(e){}
+}
+function getCookie(name){
+  try{
+    const m = document.cookie.match('(?:^|; )'+name+'=([^;]*)');
+    return m ? decodeURIComponent(m[1]) : '';
+  }catch(e){ return ''; }
+}
+function storeKey(name, val){
+  try{ localStorage.setItem(name, val); }catch(e){}
+  try{ sessionStorage.setItem(name, val); }catch(e){}
+  setCookie(name, val);
+}
+function loadKey(name){
+  return (()=>{ try{ return localStorage.getItem(name)||''; }catch(e){ return ''; } })()
+      || getCookie(name)
+      || (()=>{ try{ return sessionStorage.getItem(name)||''; }catch(e){ return ''; } })();
+}
+
+function getAnthropicKey(){ return loadKey('orbix_anthropic_key'); }
 function saveAnthropicKey(v){
-  try{ localStorage.setItem('orbix_anthropic_key', v.trim()); }catch(e){}
+  storeKey('orbix_anthropic_key', v.trim());
   const status = document.getElementById('anthropic-key-status');
   if(status){
     status.textContent = v.trim() ? '● Key saved' : 'No key saved';
     status.style.color = v.trim() ? 'var(--green)' : 'var(--text3)';
   }
-  // Pre-fill input if open
   const inp = document.getElementById('anthropic-key-input');
   if(inp && !inp.value) inp.value = v.trim();
 }
 
 // ── Gemini API key management ─────────────────────────────────────────────────
-function getGeminiKey(){ return localStorage.getItem('orbix_gemini_key')||''; }
+function getGeminiKey(){ return loadKey('orbix_gemini_key'); }
 function saveGeminiKey(v){
-  try{ localStorage.setItem('orbix_gemini_key', v.trim()); }catch(e){}
+  storeKey('orbix_gemini_key', v.trim());
   const status = document.getElementById('gemini-key-status');
   if(status){
     status.textContent = v.trim() ? '● Key saved' : 'No key — Gemini AI disabled';
