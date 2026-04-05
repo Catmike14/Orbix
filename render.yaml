@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: orbix
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: Mike
+      - key: ADMIN_PASSWORD
+        value: Mike@1234!
